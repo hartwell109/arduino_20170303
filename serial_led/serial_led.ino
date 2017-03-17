@@ -1,9 +1,17 @@
-char val;
-int ledPin = 13;
+
+int motorPin = 3;
+int switchPin = 2;
+
+char command;
+int switchStatus = 1;
+int oldStatus = 1;
 
 //初始化部分
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+  pinMode(switchPin, INPUT);
+  pinMode(13, OUTPUT);
+
   Serial.begin(9600, SERIAL_8N1);
   while (!Serial) {
     ;
@@ -12,13 +20,30 @@ void setup() {
 
 //循环部分
 void loop() {
-  val = Serial.read();
-  if ('H' == val) {
-    digitalWrite(ledPin, HIGH);
+  switchStatus = digitalRead(switchPin);
+  if (switchStatus == 0) {
+    oldStatus = 0;
   }
-  if ('F' == val) {
-    digitalWrite(ledPin, LOW);
+  command = Serial.read();
+  if (switchStatus == 0) {
+    digitalWrite(motorPin, HIGH);
+    oldStatus = 0;
   }
+  if (switchStatus == 1 && oldStatus == 0) {
+    digitalWrite(motorPin, LOW);
+  }
+
+  if ('H' == command ) {
+    digitalWrite(motorPin, HIGH);
+    oldStatus = 1;
+  }
+
+  if ('F' == command) {
+    digitalWrite(motorPin, LOW);
+    oldStatus = 1;
+  }
+
+  digitalWrite(13, oldStatus);
 }
 
 
