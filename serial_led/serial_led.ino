@@ -1,3 +1,4 @@
+//适用于转盘式的旧型号的落杯器
 
 int motorPin = 3;
 int switchPin = 2;
