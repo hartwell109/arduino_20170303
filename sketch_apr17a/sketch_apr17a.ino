@@ -1,62 +1,46 @@
+//适用于推拉式落杯器
+//脉冲接口7
+int stepperPin  = 7;
 
+//方向控制接口8
+int directionPin = 8;
 
-int stepperPins [4] = {8, 9, 10, 11};
-
+//指示灯接口13
 const int indexPin = 13;
+
+//蜂鸣器接口12
 const int tonePin = 12;
+
+//继电器a组接口4
 const int relay_A = 4;
+
+//继电器b组接口5
 const int relay_B = 5;
+
+//空杯检测接口3
 const int emptiedPin = 3;
-char command;
+
+//串口字符串指令：start
+String command;
 int emptiedStatus = 0;
 
-void stepper(int pins[4], int dir, int dur, int del) {
+void run(int dur) {
   for (int i = 0; i < dur; ++i) {
-    if (dir == 1) {
-      digitalWrite(pins[0], HIGH);
-      digitalWrite(pins[1], LOW);
-      digitalWrite(pins[2], LOW);
-      digitalWrite(pins[3], HIGH);
-      delayMicroseconds(del);
-      digitalWrite(pins[0], HIGH);
-      digitalWrite(pins[1], HIGH);
-      digitalWrite(pins[2], LOW);
-      digitalWrite(pins[3], LOW);
-      delayMicroseconds(del);
-      digitalWrite(pins[0], LOW);
-      digitalWrite(pins[1], HIGH);
-      digitalWrite(pins[2], HIGH);
-      digitalWrite(pins[3], LOW);
-      delayMicroseconds(del);
-      digitalWrite(pins[0], LOW);
-      digitalWrite(pins[1], LOW);
-      digitalWrite(pins[2], HIGH);
-      digitalWrite(pins[3], HIGH);
-      delayMicroseconds(del);
-    }
-    if (dir == -1) {
-      digitalWrite(pins[3], HIGH);
-      digitalWrite(pins[2], LOW);
-      digitalWrite(pins[1], LOW);
-      digitalWrite(pins[0], HIGH);
-      delayMicroseconds(del);
-      digitalWrite(pins[3], HIGH);
-      digitalWrite(pins[2], HIGH);
-      digitalWrite(pins[1], LOW);
-      digitalWrite(pins[0], LOW);
-      delayMicroseconds(del);
-      digitalWrite(pins[3], LOW);
-      digitalWrite(pins[2], HIGH);
-      digitalWrite(pins[1], HIGH);
-      digitalWrite(pins[0], LOW);
-      delayMicroseconds(del);
-      digitalWrite(pins[3], LOW);
-      digitalWrite(pins[2], LOW);
-      digitalWrite(pins[1], HIGH);
-      digitalWrite(pins[0], HIGH);
-      delayMicroseconds(del);
-    }
+    digitalWrite(stepperPin, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(stepperPin, LOW);
+    delayMicroseconds(500);
   }
+}
+
+void runRight(int dur) {
+  digitalWrite(directionPin, HIGH);
+  run(dur);
+}
+
+void runLeft(int dur) {
+  digitalWrite(directionPin, LOW);
+  run(dur);
 }
 
 void setup() {
@@ -65,9 +49,7 @@ void setup() {
   pinMode(emptiedPin, INPUT);
   pinMode(relay_A, OUTPUT);
   pinMode(relay_B, OUTPUT);
-  for ( int i = 0; i < 3 ; i++) {
-    pinMode(stepperPins[i], OUTPUT);
-  }
+  pinMode(stepperPin, OUTPUT);
   Serial.begin(9600, SERIAL_8N1);
   while (!Serial) {
     ;
@@ -77,36 +59,37 @@ void setup() {
 void loop() {
   emptiedStatus = digitalRead(emptiedPin);
   command = Serial.read();
-  
-  if ('h' == command && emptiedStatus == 0) {
+
+
+  if (command == "start" && emptiedStatus == 0) {
     //1、指示灯亮
     digitalWrite(indexPin, HIGH);
-    
-    //2、电机反向转动10周，512转动一周
-    stepper(stepperPins, 1, 512*10, 2200);
-    
+
+    //2、电机反向转动10周，400转动一周
+    runRight(400 * 10);
+
     //3、继电器A组松
-    digitalWrite(relay_A, HIGH);    
+    digitalWrite(relay_A, HIGH);
     delay(1000);
-    
-    //4、电机正向转动15周，512转动一周
-    stepper(stepperPins, -1, 512*15, 2200);
-    
+
+    //4、电机正向转动15周，400转动一周
+    runLeft(400 * 15);
+
     //5、继电器A组紧
     digitalWrite(relay_A, LOW);
     delay(1000);
-    
+
     //6、继电器B组松
     digitalWrite(relay_B, HIGH);
-    delay(1000);    
-    
-    //7、电机正向转动5周，512转动一周
-    stepper(stepperPins, 1, 512*5, 2200);
-    
+    delay(1000);
+
+    //7、电机正向转动5周，400转动一周
+    runRight(400 * 5);
+
     //8、继电器B组紧
     digitalWrite(relay_B, LOW);
-    delay(1000);    
-    
+    delay(1000);
+
     //9、指示灯灭
     digitalWrite(indexPin, LOW);
   }
