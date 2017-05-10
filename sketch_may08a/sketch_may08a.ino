@@ -67,7 +67,7 @@ void loop() {
 
     //2、指示灯亮
     digitalWrite(indexPin, HIGH);
-    Serial.println('start');
+    Serial.println("start");
 
     //3、电机反向转动4周，400转动一周
     rightRun(400 * 4);
@@ -93,14 +93,14 @@ void loop() {
 
     //9、电机正向转动6周，400转动一周
     rightRun(400 * 8);
-    Serial.println('success');
+    Serial.println("success");
 
     //10、电机反向转动5周，400转动一周
     leftRun(400 * 8);
 
     //11、指示灯灭
     digitalWrite(indexPin, LOW);
-    Serial.println('ready');
+    Serial.println("ready");
 
     //12、蜂鸣器短鸣两次
     tone(tonePin, 520);
