@@ -18,12 +18,13 @@ void run(int pin_pul, int dur) {
 }
 
 void rightRun(int dur) {
-  digitalWrite(pin_dir, 0);
+
+  digitalWrite(pin_dir, HIGH);
   run(pin_pul, dur);
 }
 
 void leftRun(int dur) {
-  digitalWrite(pin_dir, 1);
+  digitalWrite(pin_dir, LOW);
   run(pin_pul, dur);
 }
 
@@ -34,6 +35,7 @@ void setup() {
   pinMode(relay_A, OUTPUT);
   pinMode(relay_B, OUTPUT);
   pinMode(pin_pul, OUTPUT);
+  pinMode(pin_dir, OUTPUT);
   Serial.begin(9600, SERIAL_8N1);
   while (!Serial) {
     ;
@@ -44,12 +46,26 @@ void loop() {
   emptiedStatus = digitalRead(emptiedPin);
   command = Serial.read();
 
+  if ('a' == command && emptiedStatus == 0) {
+    rightRun(400 * 2);
+  }
+
+  if ('b' == command && emptiedStatus == 0) {
+    leftRun(400 * 2);
+  }
+
+
   if ('h' == command && emptiedStatus == 0) {
+    //0
+    tone(tonePin, 520);
+    delay(1000);
+    noTone(tonePin);
+
     //1、指示灯亮
     digitalWrite(indexPin, HIGH);
 
     //2、电机反向转动4周，400转动一周
-    leftRun(400 * 4);
+    rightRun(400 * 4);
 
     Serial.write('success');
 
@@ -59,26 +75,33 @@ void loop() {
 
     //4、继电器A组紧
     digitalWrite(relay_A, LOW);
-    delay(1000);
+    delay(500);
 
     //5、继电器B组松
     digitalWrite(relay_B, HIGH);
-    delay(1000);
+    delay(500);
 
     //6、电机正向转动4周，400转动一周
-    rightRun(400 * 4);
+    leftRun(400 * 4);
 
     //7、继电器B组紧
     digitalWrite(relay_B, LOW);
-    delay(1000);
+    delay(500);
 
     //8、电机正向转动6周，400转动一周
-    leftRun(400 * 6);
+    rightRun(400 * 8);
 
     //9、电机反向转动5周，400转动一周
-    rightRun(400 * 6);
+    leftRun(400 * 8);
 
     //10、指示灯灭
+    tone(tonePin, 520);
+    delay(500);
+    noTone(tonePin);
+    delay(500);
+    tone(tonePin, 520);
+    delay(500);
+    noTone(tonePin);
     digitalWrite(indexPin, LOW);
   }
 
