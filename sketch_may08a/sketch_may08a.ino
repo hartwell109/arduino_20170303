@@ -1,11 +1,12 @@
-const int pin_pul = 8;
-const int pin_dir = 7;
-const int pin_ctrl = 6;
-const int indexPin = 13;
-const int tonePin = 12;
+
+const int emptiedPin = 3;
 const int relay_A = 4;
 const int relay_B = 5;
-const int emptiedPin = 3;
+const int pin_ctrl = 6;
+const int pin_dir = 7;
+const int pin_pul = 8;
+const int tonePin = 12;
+const int indexPin = 13;
 char command;
 int emptiedStatus = 0;
 
@@ -66,11 +67,10 @@ void loop() {
 
     //2、指示灯亮
     digitalWrite(indexPin, HIGH);
+    Serial.println('start');
 
     //3、电机反向转动4周，400转动一周
     rightRun(400 * 4);
-
-    Serial.write('success');
 
     //4、继电器A组松
     digitalWrite(relay_A, HIGH);
@@ -93,12 +93,14 @@ void loop() {
 
     //9、电机正向转动6周，400转动一周
     rightRun(400 * 8);
+    Serial.println('success');
 
     //10、电机反向转动5周，400转动一周
     leftRun(400 * 8);
 
     //11、指示灯灭
     digitalWrite(indexPin, LOW);
+    Serial.println('ready');
 
     //12、蜂鸣器短鸣两次
     tone(tonePin, 520);
