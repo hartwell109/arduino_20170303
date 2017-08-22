@@ -40,6 +40,7 @@ void setup() {
   pinMode(pin_pul, OUTPUT);
   pinMode(pin_dir, OUTPUT);
   pinMode(pin_ctrl, OUTPUT);
+  digitalWrite(pin_ctrl, HIGH);
   Serial.begin(9600, SERIAL_8N1);
   while (!Serial) {
     ;
@@ -49,6 +50,7 @@ void setup() {
 void loop() {
   emptiedStatus = digitalRead(emptiedPin);
   command = Serial.read();
+  digitalWrite(pin_ctrl, HIGH);
 
   if ('a' == command && emptiedStatus == 0) {
     rightRun(400 * 2);
